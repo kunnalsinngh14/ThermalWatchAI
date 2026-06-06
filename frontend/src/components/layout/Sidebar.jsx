@@ -50,7 +50,6 @@ const Sidebar = ({ isOpen }) => {
         <div className="logo-icon glow-border">
           <Activity size={24} className="text-blue" />
         </div>
-        <h2 className="logo-text">Thermal<span className="text-blue">Watch</span></h2>
       </div>
 
       <div className="sidebar-scroll">
