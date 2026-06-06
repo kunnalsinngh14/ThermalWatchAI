@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { ShieldAlert, Wrench, LogIn, Menu } from 'lucide-react';
+import { ShieldAlert, Wrench, LogIn, Menu, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import LoginModal from './LoginModal';
 import './Header.css';
 
@@ -14,6 +15,12 @@ const Header = ({ toggleSidebar }) => {
         <button onClick={toggleSidebar} className="btn-icon" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-primary)' }}>
           <Menu size={24} />
         </button>
+        {role !== 'guest' && (
+          <Link to="/ai-assistant" className="btn-quick-ai glow-border" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'var(--bg-primary)', border: '1px solid var(--accent-primary)', borderRadius: '8px', color: 'var(--accent-primary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500, transition: 'all 0.2s ease' }}>
+            <Sparkles size={16} />
+            Click here to use your AI Assistant
+          </Link>
+        )}
       </div>
       
       <div className="header-right">

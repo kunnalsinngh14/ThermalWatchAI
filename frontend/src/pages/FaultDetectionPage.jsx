@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { DiagnosticForm } from '../components/fault-detection/DiagnosticForm';
 import { ResultCard } from '../components/fault-detection/ResultCard';
 import { RaiseRequestModal } from '../components/fault-detection/RaiseRequestModal';
-import { AIChatbotWidget } from '../components/fault-detection/AIChatbotWidget';
 
 export const FaultDetectionPage = () => {
   const [result, setResult] = useState(null);
@@ -42,9 +41,6 @@ export const FaultDetectionPage = () => {
         result={result}
         onSubmit={handleModalSubmit}
       />
-      
-      {/* Floating AI Chatbot Orb */}
-      <AIChatbotWidget />
     </div>
   );
 };

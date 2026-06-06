@@ -549,3 +549,18 @@ def get_dropped_history(current_user):
             'timestamp': int(r.created_at.timestamp() * 1000) if r.created_at else 0
         })
     return jsonify(result)
+
+# --- AI CHATBOT ROUTE ---
+@api_bp.route('/chat', methods=['POST'])
+@roles_required('admin', 'engineer')
+def chat(current_user):
+    data = request.get_json()
+    if not data or 'messages' not in data:
+        return jsonify({'message': 'Missing messages array'}), 400
+        
+    try:
+        from ai_service import process_chat_message
+        response_text = process_chat_message(data['messages'])
+        return jsonify({'response': response_text}), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500

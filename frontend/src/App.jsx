@@ -18,6 +18,7 @@ import { StatsSubmissionPage } from './pages/StatsSubmissionPage';
 import { FaultHistoryPage } from './pages/FaultHistoryPage';
 import { MaintenanceHistoryPage } from './pages/MaintenanceHistoryPage';
 import { DroppedHistoryPage } from './pages/DroppedHistoryPage';
+import { AIChatPage } from './pages/AIChatPage';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
               <Route path="/history/faults" element={<FaultHistoryPage />} />
               <Route path="/history/maintenance" element={<MaintenanceHistoryPage />} />
               <Route path="/history/dropped" element={<DroppedHistoryPage />} />
+              <Route path="/ai-assistant" element={<AIChatPage />} />
             </Route>
 
             {/* Admin Only Routes */}

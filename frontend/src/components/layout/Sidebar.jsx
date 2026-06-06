@@ -16,7 +16,8 @@ import {
   User,
   LogOut,
   ShieldAlert,
-  LogIn
+  LogIn,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
@@ -59,6 +60,13 @@ const Sidebar = ({ isOpen }) => {
             <Home size={18} />
             <span>Global Overview</span>
           </NavLink>
+          
+          {role !== 'guest' && (
+            <NavLink to="/ai-assistant" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+              <Sparkles size={18} className="text-blue" />
+              <span style={{ fontWeight: 500, color: 'var(--accent-primary)' }}>AI Assistant</span>
+            </NavLink>
+          )}
           
           {plants.map(plant => (
             <NavLink 
