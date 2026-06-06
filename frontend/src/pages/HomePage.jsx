@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Factory, Cog, Zap, Activity, Leaf, Gauge, BatteryCharging, PlayCircle, Wrench } from 'lucide-react';
 import { KPICard } from '../components/dashboard/KPICard';
 import { TelemetryChart } from '../components/dashboard/TelemetryChart';
@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 
 export const HomePage = () => {
   const { role } = useAuth();
+  const [powerRange, setPowerRange] = useState('7days');
   const [data, setData] = useState({
     kpis: { plants: 0, units: 0, faults: 0, capacity: 0, runningUnits: 0, maintenanceUnits: 0 },
     powerData: [],
@@ -123,7 +124,7 @@ export const HomePage = () => {
               };
             }
 
-            dailyPower = sortedLabels.map(label => ({ time: label, value: grouped[label].power, unit: 'MWh' }));
+            dailyPower = sortedLabels.map(label => ({ time: label, value: grouped[label].power, unit: 'MWh', rawDate: grouped[label].rawDate }));
             dailyWater = sortedLabels.map(label => ({ time: label, value: grouped[label].water, unit: 'm³' }));
             dailyCoal = sortedLabels.map(label => ({ time: label, value: grouped[label].coal, unit: 't' }));
             dailyCo2 = sortedLabels.map(label => ({ time: label, value: grouped[label].co2, unit: 't' }));
@@ -182,6 +183,27 @@ export const HomePage = () => {
     fetchData();
   }, [role]);
 
+  const filteredDailyPower = useMemo(() => {
+    if (!data.dailyPowerData || data.dailyPowerData.length === 0) return [];
+    if (powerRange === 'all') return data.dailyPowerData;
+    
+    const cutoffDate = new Date();
+    if (powerRange === '7days') cutoffDate.setDate(cutoffDate.getDate() - 7);
+    else if (powerRange === '30days') cutoffDate.setDate(cutoffDate.getDate() - 30);
+    
+    if (powerRange === 'lastMonth') {
+       const now = new Date();
+       const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+       const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+       return data.dailyPowerData.filter(d => {
+           const dDate = new Date(d.rawDate);
+           return dDate >= start && dDate <= end;
+       });
+    }
+    
+    return data.dailyPowerData.filter(d => new Date(d.rawDate) >= cutoffDate);
+  }, [data.dailyPowerData, powerRange]);
+
   return (
     <div className="fade-in" style={{ paddingBottom: '40px' }}>
       <h2 style={{ marginBottom: '24px', fontWeight: 500 }}>Global Overview Dashboard</h2>
@@ -197,14 +219,26 @@ export const HomePage = () => {
       </div>
 
       {/* Power Generation Section */}
-      <div className="section-header">
-        <Zap size={18} className="section-icon text-crimson" />
-        <h3>Power Generation</h3>
+      <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Zap size={18} className="section-icon text-crimson" />
+          <h3 style={{ margin: 0 }}>Power Generation</h3>
+        </div>
+        <select 
+          value={powerRange} 
+          onChange={e => setPowerRange(e.target.value)}
+          style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-glass)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', outline: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
+        >
+          <option value="7days">Last 7 Days</option>
+          <option value="30days">Last 30 Days</option>
+          <option value="lastMonth">Last Month</option>
+          <option value="all">All Time</option>
+        </select>
       </div>
       <div className="metric-grid-2">
         <TelemetryChart 
-          title="Power Generated Per Day" 
-          data={data.dailyPowerData} 
+          title="Power Generated" 
+          data={filteredDailyPower} 
           dataKey="value" 
           strokeColor="var(--accent-primary)" 
           fillColor="var(--accent-primary)" 

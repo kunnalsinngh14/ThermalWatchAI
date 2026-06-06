@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Factory, Cog, Zap, Activity, Leaf, Gauge, BatteryCharging, PlayCircle, Wrench } from 'lucide-react';
 import { KPICard } from '../components/dashboard/KPICard';
@@ -10,6 +10,7 @@ import { useAuth } from '../hooks/useAuth';
 export const PlantPage = () => {
   const { plantId } = useParams();
   const { role } = useAuth();
+  const [powerRange, setPowerRange] = useState('7days');
   
   const [data, setData] = useState({
     name: 'Loading...',
@@ -89,7 +90,7 @@ export const PlantPage = () => {
               const parts = dateStr.split('-');
               const label = `${parts[1]}-${parts[2]}`; // "MM-DD"
               
-              dailyPower.push({ time: label, value: s.powerGenerated, unit: 'MWh' });
+              dailyPower.push({ time: label, value: s.powerGenerated, unit: 'MWh', rawDate: s.date });
               dailyWater.push({ time: label, value: s.waterConsumption, unit: 'm³' });
               dailyCoal.push({ time: label, value: s.coalConsumption, unit: 't' });
               dailyCo2.push({ time: label, value: s.co2Emissions, unit: 't' });
@@ -104,7 +105,7 @@ export const PlantPage = () => {
             const nextDay = String(nextDate.getDate()).padStart(2, '0');
             const nextLabel = `${nextMonth}-${nextDay}`;
 
-            dailyPower.push({ time: nextLabel, value: lastSub.powerGenerated, unit: 'MWh' });
+            dailyPower.push({ time: nextLabel, value: lastSub.powerGenerated, unit: 'MWh', rawDate: `${nextDate.getFullYear()}-${nextMonth}-${nextDay}` });
             dailyWater.push({ time: nextLabel, value: lastSub.waterConsumption, unit: 'm³' });
             dailyCoal.push({ time: nextLabel, value: lastSub.coalConsumption, unit: 't' });
             dailyCo2.push({ time: nextLabel, value: lastSub.co2Emissions, unit: 't' });
@@ -149,6 +150,27 @@ export const PlantPage = () => {
     fetchData();
   }, [plantId, role]);
 
+  const filteredDailyPower = useMemo(() => {
+    if (!data.dailyPowerData || data.dailyPowerData.length === 0) return [];
+    if (powerRange === 'all') return data.dailyPowerData;
+    
+    const cutoffDate = new Date();
+    if (powerRange === '7days') cutoffDate.setDate(cutoffDate.getDate() - 7);
+    else if (powerRange === '30days') cutoffDate.setDate(cutoffDate.getDate() - 30);
+    
+    if (powerRange === 'lastMonth') {
+       const now = new Date();
+       const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+       const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+       return data.dailyPowerData.filter(d => {
+           const dDate = new Date(d.rawDate);
+           return dDate >= start && dDate <= end;
+       });
+    }
+    
+    return data.dailyPowerData.filter(d => new Date(d.rawDate) >= cutoffDate);
+  }, [data.dailyPowerData, powerRange]);
+
   return (
     <div className="fade-in" style={{ paddingBottom: '40px' }}>
       <h2 style={{ marginBottom: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>{data.name} — Dashboard</h2>
@@ -176,12 +198,24 @@ export const PlantPage = () => {
       <div className="dashboard-grid" style={{ marginBottom: '32px' }}>
         {/* Power Generation - Left 8 columns */}
         <div className="col-span-8">
-          <div className="section-header" style={{ marginTop: 0 }}>
-            <Zap size={18} className="section-icon text-blue" />
-            <h3>Power Generation</h3>
+          <div className="section-header" style={{ marginTop: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Zap size={18} className="section-icon text-blue" />
+              <h3 style={{ margin: 0 }}>Power Generation</h3>
+            </div>
+            <select 
+              value={powerRange} 
+              onChange={e => setPowerRange(e.target.value)}
+              style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-glass)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', outline: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
+            >
+              <option value="7days">Last 7 Days</option>
+              <option value="30days">Last 30 Days</option>
+              <option value="lastMonth">Last Month</option>
+              <option value="all">All Time</option>
+            </select>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <TelemetryChart title="Power Generated Per Day" data={data.dailyPowerData} dataKey="value" strokeColor="var(--accent-primary)" fillColor="var(--accent-primary)" />
+            <TelemetryChart title="Power Generated" data={filteredDailyPower} dataKey="value" strokeColor="var(--accent-primary)" fillColor="var(--accent-primary)" />
           </div>
         </div>
 

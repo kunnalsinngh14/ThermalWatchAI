@@ -1,6 +1,6 @@
 import os
 import google.generativeai as genai
-from models import Plant, Unit, Request, DailySubmission, db
+from models import Plant, Unit, Request, DailySubmission, User, db
 from ml_service import predict_fault
 import traceback
 import json
@@ -67,6 +67,61 @@ def get_plant_stats() -> str:
     except Exception as e:
         return f"Error querying database: {str(e)}"
 
+def get_daily_submissions(plant_name: str = None, date: str = None) -> str:
+    """
+    Queries the database for daily historical telemetry submissions (power generated, water/coal consumption, CO2 emissions, etc.).
+    
+    Args:
+        plant_name: Optional. The name of the plant to filter by (e.g., 'Ahmedabad Power Plant').
+        date: Optional. The specific date to filter by in 'YYYY-MM-DD' format (e.g., '2026-06-06').
+        
+    Returns:
+        A JSON string containing the daily submissions matching the criteria.
+    """
+    try:
+        query = DailySubmission.query.join(Plant)
+        if plant_name:
+            query = query.filter(Plant.name.ilike(f"%{plant_name}%"))
+        if date:
+            query = query.filter(DailySubmission.date == date)
+            
+        submissions = query.all()
+        result = []
+        for s in submissions:
+            result.append({
+                "plant_name": s.plant.name,
+                "date": str(s.date),
+                "power_generated_mwh": float(s.power_generated),
+                "auxiliary_power_mw": float(s.auxiliary_power),
+                "water_consumption_m3": float(s.water_consumption),
+                "coal_consumption_t": float(s.coal_consumption),
+                "co2_emissions_t": float(s.co2_emissions),
+                "fly_ash_t": float(s.fly_ash)
+            })
+        if not result:
+            return "No submissions found for the given criteria."
+        return json.dumps(result)
+    except Exception as e:
+        return f"Error querying database: {str(e)}"
+
+def get_system_users_stats() -> str:
+    """
+    Queries the database to return the count of engineers and administrators in the system.
+    
+    Returns:
+        A JSON string containing user statistics.
+    """
+    try:
+        engineers = User.query.filter_by(role='engineer').count()
+        admins = User.query.filter_by(role='admin').count()
+        return json.dumps({
+            "total_users": engineers + admins,
+            "engineers": engineers,
+            "administrators": admins
+        })
+    except Exception as e:
+        return f"Error querying user database: {str(e)}"
+
 _chat_model = None
 
 def get_chat_model():
@@ -81,7 +136,7 @@ def get_chat_model():
         )
         _chat_model = genai.GenerativeModel(
             model_name='gemini-3.5-flash',
-            tools=[execute_fault_detection, get_plant_stats],
+            tools=[execute_fault_detection, get_plant_stats, get_daily_submissions, get_system_users_stats],
             system_instruction=system_instruction
         )
     return _chat_model
@@ -114,4 +169,7 @@ def process_chat_message(messages):
         return response.text
     except Exception as e:
         traceback.print_exc()
-        return f"Error communicating with AI: {str(e)}"
+        error_msg = str(e)
+        if "429" in error_msg and "quota" in error_msg.lower():
+            return "⚠️ **Rate Limit Exceeded:** You've made too many requests to the AI in a short period of time. Please wait about 30 to 60 seconds and try your question again!"
+        return f"Error communicating with AI: {error_msg}"
