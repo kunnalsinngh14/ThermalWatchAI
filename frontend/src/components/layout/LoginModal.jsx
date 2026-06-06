@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../contexts/ToastContext';
 import { X, Lock, Mail } from 'lucide-react';
@@ -27,7 +28,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     }
   };
 
-  return (
+  return createPortal(
     <div className="modal-overlay">
       <div className="modal-container login-modal">
         <button className="close-btn" onClick={onClose}><X size={20} /></button>
@@ -74,7 +75,8 @@ const LoginModal = ({ isOpen, onClose }) => {
           </button>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

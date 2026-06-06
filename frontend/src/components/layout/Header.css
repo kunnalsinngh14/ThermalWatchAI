@@ -33,7 +33,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition-fast);
-  color: #fff;
+  color: var(--accent-primary);
 }
 
 .btn-engineer {

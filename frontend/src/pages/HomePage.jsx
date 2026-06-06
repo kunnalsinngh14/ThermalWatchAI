@@ -203,18 +203,11 @@ export const HomePage = () => {
       </div>
       <div className="metric-grid-2">
         <TelemetryChart 
-          title="Net Power Output (Real-Time)" 
-          data={data.powerData} 
-          dataKey="value" 
-          strokeColor="var(--accent-primary)" 
-          fillColor="var(--accent-primary)" 
-        />
-        <TelemetryChart 
           title="Power Generated Per Day" 
           data={data.dailyPowerData} 
           dataKey="value" 
-          strokeColor="var(--accent-amber)" 
-          fillColor="var(--accent-amber)" 
+          strokeColor="var(--accent-primary)" 
+          fillColor="var(--accent-primary)" 
         />
       </div>
 
@@ -280,8 +273,8 @@ export const HomePage = () => {
           title="Fly Ash Generated" 
           data={data.environmental.flyAshData} 
           dataKey="value" 
-          strokeColor="var(--text-secondary)" 
-          fillColor="var(--text-secondary)" 
+          strokeColor="var(--accent-emerald)" 
+          fillColor="var(--accent-emerald)" 
         />
       </div>
     </div>

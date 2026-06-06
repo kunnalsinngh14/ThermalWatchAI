@@ -151,36 +151,52 @@ export const PlantPage = () => {
 
   return (
     <div className="fade-in" style={{ paddingBottom: '40px' }}>
-      <h2 style={{ marginBottom: '24px', fontWeight: 500 }}>{data.name} — Dashboard</h2>
+      <h2 style={{ marginBottom: '24px', fontWeight: 600, color: 'var(--text-primary)' }}>{data.name} — Dashboard</h2>
       
-      {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-        <KPICard title="Total Units" value={data.kpis.units} icon={Cog} colorClass="border-crimson" />
-        <KPICard title="Net Capacity" value={`${data.kpis.capacity} MW`} icon={Zap} colorClass="border-amber" />
-        <KPICard title="Running Units" value={data.kpis.runningUnits} icon={PlayCircle} colorClass="border-emerald" />
-        <KPICard title="Under Maintenance" value={data.kpis.maintenanceUnits} icon={Wrench} colorClass="border-amber" />
-        <KPICard title="Faulty Units" value={data.kpis.faults} icon={Factory} colorClass={data.kpis.faults > 0 ? "border-red" : "border-emerald"} />
+      {/* KPI Cards: 12-column grid, span 3 for each (approx 4 in a row, the 5th wraps or takes span 3) */}
+      <div className="dashboard-grid" style={{ marginBottom: '32px' }}>
+        <div className="col-span-3">
+          <KPICard title="Total Units" value={data.kpis.units} icon={Cog} colorClass="border-blue" />
+        </div>
+        <div className="col-span-3">
+          <KPICard title="Net Capacity" value={`${data.kpis.capacity} MW`} icon={Zap} colorClass="border-blue" />
+        </div>
+        <div className="col-span-3">
+          <KPICard title="Running Units" value={data.kpis.runningUnits} icon={PlayCircle} colorClass="border-emerald" />
+        </div>
+        <div className="col-span-3">
+          <KPICard title="Under Maintenance" value={data.kpis.maintenanceUnits} icon={Wrench} colorClass="border-amber" />
+        </div>
+        {/* Placed prominently if there's a fault */}
+        <div className="col-span-4">
+          <KPICard title="Faulty Units" value={data.kpis.faults} icon={Factory} colorClass={data.kpis.faults > 0 ? "border-red" : "border-emerald"} />
+        </div>
       </div>
 
-      {/* Power Generation */}
-      <div className="section-header">
-        <Zap size={18} className="section-icon text-crimson" />
-        <h3>Power Generation</h3>
-      </div>
-      <div className="metric-grid-2">
-        <TelemetryChart title="Unit Power Output (Real-Time)" data={data.powerData} dataKey="value" strokeColor="var(--accent-primary)" fillColor="var(--accent-primary)" />
-        <TelemetryChart title="Power Generated Per Day" data={data.dailyPowerData} dataKey="value" strokeColor="var(--accent-amber)" fillColor="var(--accent-amber)" />
-      </div>
+      <div className="dashboard-grid" style={{ marginBottom: '32px' }}>
+        {/* Power Generation - Left 8 columns */}
+        <div className="col-span-8">
+          <div className="section-header" style={{ marginTop: 0 }}>
+            <Zap size={18} className="section-icon text-blue" />
+            <h3>Power Generation</h3>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <TelemetryChart title="Power Generated Per Day" data={data.dailyPowerData} dataKey="value" strokeColor="var(--accent-primary)" fillColor="var(--accent-primary)" />
+          </div>
+        </div>
 
-      {/* Efficiency Metrics */}
-      <div className="section-header">
-        <Gauge size={18} className="section-icon text-emerald" />
-        <h3>Efficiency Metrics</h3>
-      </div>
-      <div className="metric-grid">
-        <GaugeChart title="Plant Efficiency" value={data.efficiency.plantEff} maxValue={50} unit="%" color="var(--accent-emerald)" />
-        <MetricCard title="Auxiliary Power" value={data.efficiency.auxPower} unit="MW" icon={BatteryCharging} color="var(--accent-amber)" />
-        <GaugeChart title="Capacity Utilization" value={data.efficiency.capacityUtil} maxValue={100} unit="%" color="var(--accent-cyan)" />
+        {/* Efficiency Metrics - Right 4 columns */}
+        <div className="col-span-4">
+          <div className="section-header" style={{ marginTop: 0 }}>
+            <Gauge size={18} className="section-icon text-emerald" />
+            <h3>Efficiency Metrics</h3>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <GaugeChart title="Plant Efficiency" value={data.efficiency.plantEff} maxValue={50} unit="%" color="var(--accent-emerald)" />
+            <MetricCard title="Auxiliary Power" value={data.efficiency.auxPower} unit="MW" icon={BatteryCharging} color="var(--accent-amber)" />
+            <GaugeChart title="Capacity Utilization" value={data.efficiency.capacityUtil} maxValue={100} unit="%" color="var(--accent-cyan)" />
+          </div>
+        </div>
       </div>
 
       {/* Environmental Monitoring */}
@@ -188,13 +204,19 @@ export const PlantPage = () => {
         <Leaf size={18} className="section-icon text-emerald" />
         <h3>Environmental Monitoring</h3>
       </div>
-      <div className="metric-grid-2">
-        <TelemetryChart title="Water Consumption" data={data.environmental.waterData} dataKey="value" strokeColor="var(--accent-cyan)" fillColor="var(--accent-cyan)" />
-        <TelemetryChart title="Coal Consumption" data={data.environmental.coalData} dataKey="value" strokeColor="var(--accent-amber)" fillColor="var(--accent-amber)" />
-      </div>
-      <div className="metric-grid-2" style={{ marginTop: '20px' }}>
-        <TelemetryChart title="CO₂ Emissions" data={data.environmental.co2Data} dataKey="value" strokeColor="var(--accent-red)" fillColor="var(--accent-red)" />
-        <TelemetryChart title="Fly Ash Generated" data={data.environmental.flyAshData} dataKey="value" strokeColor="var(--text-secondary)" fillColor="var(--text-secondary)" />
+      <div className="dashboard-grid">
+        <div className="col-span-6">
+          <TelemetryChart title="Water Consumption" data={data.environmental.waterData} dataKey="value" strokeColor="var(--accent-cyan)" fillColor="var(--accent-cyan)" />
+        </div>
+        <div className="col-span-6">
+          <TelemetryChart title="Coal Consumption" data={data.environmental.coalData} dataKey="value" strokeColor="var(--accent-amber)" fillColor="var(--accent-amber)" />
+        </div>
+        <div className="col-span-6">
+          <TelemetryChart title="CO₂ Emissions" data={data.environmental.co2Data} dataKey="value" strokeColor="var(--accent-red)" fillColor="var(--accent-red)" />
+        </div>
+        <div className="col-span-6">
+          <TelemetryChart title="Fly Ash Generated" data={data.environmental.flyAshData} dataKey="value" strokeColor="var(--accent-emerald)" fillColor="var(--accent-emerald)" />
+        </div>
       </div>
     </div>
   );

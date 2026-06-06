@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { User, LogOut, ShieldAlert, Wrench, LogIn } from 'lucide-react';
+import { ShieldAlert, Wrench, LogIn, Menu } from 'lucide-react';
 import LoginModal from './LoginModal';
 import './Header.css';
 
-const Header = () => {
-  const { user, role, logout } = useAuth();
+const Header = ({ toggleSidebar }) => {
+  const { role } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <header className="header glass-card">
-      <div className="header-left">
-        <h2 className="header-title">ThermalWatch Dashboard</h2>
+      <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <button onClick={toggleSidebar} className="btn-icon" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-primary)' }}>
+          <Menu size={24} />
+        </button>
       </div>
       
       <div className="header-right">
@@ -35,15 +37,6 @@ const Header = () => {
               {role === 'admin' ? <ShieldAlert size={14} /> : <Wrench size={14} />}
               <span>{role.toUpperCase()}</span>
             </div>
-            
-            <div className="user-info">
-              <User size={16} className="text-secondary" />
-              <span className="user-email">{user?.email}</span>
-            </div>
-            
-            <button className="btn-logout" onClick={logout} title="Logout">
-              <LogOut size={18} />
-            </button>
           </div>
         )}
       </div>

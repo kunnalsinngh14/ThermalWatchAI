@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import './AppLayout.css';
 
 const AppLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   return (
-    <div className="app-layout">
-      <Sidebar />
+    <div className={`app-layout ${isSidebarOpen ? '' : 'sidebar-closed'}`}>
+      <Sidebar isOpen={isSidebarOpen} />
       <div className="main-content">
-        <Header />
+        <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         <div className="canvas-area">
           <Outlet />
         </div>

@@ -476,8 +476,7 @@ def add_unit_to_plant(current_user, plant_id):
 
 # --- SUBMISSIONS & HISTORY LOGS ROUTES ---
 @api_bp.route('/submissions', methods=['GET'])
-@roles_required('admin', 'engineer')
-def get_submissions(current_user):
+def get_submissions():
     plant_id = request.args.get('plant_id')
     query = DailySubmission.query
     if plant_id:

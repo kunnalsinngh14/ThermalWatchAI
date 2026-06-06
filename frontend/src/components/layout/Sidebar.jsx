@@ -12,15 +12,21 @@ import {
   Wrench,
   History,
   CheckSquare,
-  Trash2
+  Trash2,
+  User,
+  LogOut,
+  ShieldAlert,
+  LogIn
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
+import LoginModal from './LoginModal';
 import './Sidebar.css';
 
-const Sidebar = () => {
-  const { role } = useAuth();
+const Sidebar = ({ isOpen }) => {
+  const { user, role, logout } = useAuth();
   const [plants, setPlants] = useState([]);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchPlants = async () => {
@@ -38,12 +44,12 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? '' : 'closed'}`}>
       <div className="sidebar-header">
         <div className="logo-icon glow-border">
-          <Activity size={24} className="text-crimson" />
+          <Activity size={24} className="text-blue" />
         </div>
-        <h2 className="logo-text">Thermal<span className="text-crimson">Watch</span></h2>
+        <h2 className="logo-text">Thermal<span className="text-blue">Watch</span></h2>
       </div>
 
       <div className="sidebar-scroll">
@@ -134,6 +140,38 @@ const Sidebar = () => {
               <span>Manage Engineers</span>
             </NavLink>
           </nav>
+        )}
+      </div>
+
+      <div className="sidebar-footer">
+        {role === 'guest' ? (
+          <div className="sidebar-auth-buttons">
+            <button 
+              className="btn-sidebar-login glow-border" 
+              onClick={() => setIsLoginModalOpen(true)}
+            >
+              <LogIn size={16} />
+              <span>Login</span>
+            </button>
+            <LoginModal 
+              isOpen={isLoginModalOpen} 
+              onClose={() => setIsLoginModalOpen(false)} 
+            />
+          </div>
+        ) : (
+          <div className="sidebar-user-profile">
+            <div className="sidebar-user-info">
+              <div className={`role-badge role-${role}`}>
+                {role === 'admin' ? <ShieldAlert size={14} /> : <Wrench size={14} />}
+                <span>{role.toUpperCase()}</span>
+              </div>
+            </div>
+            
+            <button className="btn-sidebar-logout" onClick={logout} title="Logout">
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          </div>
         )}
       </div>
     </aside>

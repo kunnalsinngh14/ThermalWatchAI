@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DiagnosticForm } from '../components/fault-detection/DiagnosticForm';
 import { ResultCard } from '../components/fault-detection/ResultCard';
 import { RaiseRequestModal } from '../components/fault-detection/RaiseRequestModal';
+import { AIChatbotWidget } from '../components/fault-detection/AIChatbotWidget';
 
 export const FaultDetectionPage = () => {
   const [result, setResult] = useState(null);
@@ -22,8 +23,8 @@ export const FaultDetectionPage = () => {
   };
 
   return (
-    <div className="fade-in" style={{ paddingBottom: '40px' }}>
-      <h2 style={{ marginBottom: '24px', fontWeight: 500 }}>Turbine Fault Detection Module</h2>
+    <div className="fade-in" style={{ paddingBottom: '40px', position: 'relative', minHeight: '80vh' }}>
+      <h2 style={{ marginBottom: '24px', fontWeight: 600 }}>Turbine Fault Detection Module</h2>
       
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
         {/* Left Panel: Inputs */}
@@ -41,6 +42,9 @@ export const FaultDetectionPage = () => {
         result={result}
         onSubmit={handleModalSubmit}
       />
+      
+      {/* Floating AI Chatbot Orb */}
+      <AIChatbotWidget />
     </div>
   );
 };
