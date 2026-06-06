@@ -1,0 +1,56 @@
+.kpi-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  border-bottom-width: 3px;
+}
+
+.kpi-card.border-blue { border-bottom-color: var(--accent-blue); }
+.kpi-card.border-emerald { border-bottom-color: var(--accent-emerald); }
+.kpi-card.border-amber { border-bottom-color: var(--accent-amber); }
+.kpi-card.border-red { border-bottom-color: var(--accent-red); }
+.kpi-card.border-crimson { border-bottom-color: var(--accent-primary); }
+.kpi-card.border-cyan { border-bottom-color: var(--accent-cyan); }
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpi-title {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.kpi-icon-wrapper {
+  opacity: 0.8;
+}
+
+.kpi-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* Add a subtle background glow */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.05;
+  filter: blur(20px);
+}

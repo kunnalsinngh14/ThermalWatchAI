@@ -1,0 +1,98 @@
+﻿PRODUCT REQUIREMENT DOCUMENT
+AI-Powered Thermal Power Plant Monitoring & Fault Detection PlatformTailored for Antigravity Development Execution (Updated)
+Prepared For: Antigravity Engineering TeamDocument Version: 1.1Target Deployment Window: 6-Week IterationConfidentiality: Internal Engineering Spec
+1. Executive Summary & UI Framework
+This Product Requirement Document (PRD) outlines the detailed engineering and UI/UX design components for a centralized, web-based Thermal Power Plant Monitoring and Fault Detection platform. The interface structure adheres to a dashboard split-pane grid methodology designed for extreme operational transparency, low sensory fatigue, and continuous asset visibility.
+1.1 Visual Layout Strategy
+Taking direct structural cues from established, high-density dashboard architectures (e.g., standard enterprise single-screen bank-grade frameworks), the interface breaks out into two unyielding layout pillars:
+Fixed Navigation Sidebar: Positioned on the absolute left margin of the screen canvas. Utilizes a deep dark profile to isolate navigation controls from analytics viewports. The top component houses the platform branding followed immediately by unified workspace routing mechanisms.
+Dynamic Content Workspace Canvas: Occupies the dominant screen real estate on the right side. All operational telemetry, charts, grids, data input tables, and priority management modules render inside this frame inside a scroll-managed window.
+2. Authentication & Simulation Control Architecture
+The platform implements a stateless JSON Web Token (JWT) workflow to govern system routing privileges. To accelerate front-end/back-end standalone testing and simplify verification cycles without manual data-seeding blockers, two global validation override buttons are permanently surfaced in the header bar of the client view:
+'Log in as Engineer': Instantly drops a valid short-lived JWT containing role engineering claims into storage, refreshing the sidebar layout with specific machine diagnostic tool access.
+'Log in as Admin': Instantly injects an administrative JWT token structure, unlocking global asset configuration matrices, team permissions management, and authorization write privileges across request pipelines.
+2.1 Explicit Seeded Dummy Credentials
+The simulation and authentication endpoints must recognize and accept the following seeded testing credentials to generate matching JWT payloads:
+Engineer Baseline Profile: Email: dummyengg@gmail.com | Password: enggpass
+Admin Baseline Profile: Email: dummyadmin@gmail.com | Password: adminpassword
+CRITICAL AUTHENTICATION SECURITY REGIMESecurity Governance Implementation Notice:All data-mutating endpoints exposed by the FastAPI/Flask backend service layer must explicitly fetch the incoming authorization payload header ('Authorization: Bearer <token>') and run middleware verification to prevent role-spoofing or privilege escalation vulnerabilities.
+3. Core Workspace & Sidebar Navigation Structure
+3.1 Initial Seeding Conditions (System Boot)
+Upon database structural initialization and execution of the base seeding migrations, the persistence layer must hardcode two parent plant environments with an optimal, unblemished structural health status:
+Ahmedabad Power Plant: Initialized with 10 production units. Faulty Units Baseline counter set to 0.
+Godda Power Plant: Initialized with 10 production units. Faulty Units Baseline counter set to 0.
+3.2 Dynamic Conditional States Matrix
+The visibility layer on the left navigation sidebar shifts configurations dynamically following role token changes:
+Sidebar Navigation Element
+Guest View
+Engineer View
+Admin View
+Home (Global Dashboard)
+Viewable
+Viewable
+Viewable
+Ahmedabad Power Plant (Isolated Metrics)
+Viewable
+Viewable
+Viewable
+Godda Power Plant (Isolated Metrics)
+Viewable
+Viewable
+Viewable
+Dynamically Appended Plants
+Viewable
+Viewable
+Viewable
+Fault Detection (AI Interface)
+HIDDEN
+VIEWABLE
+HIDDEN
+Raised Requests (Central Hub)
+HIDDEN
+VIEWABLE (Read)
+VIEWABLE (Full Write)
+Add / Remove Plants Control Panel
+HIDDEN
+HIDDEN
+VIEWABLE
+Add / Remove Units Control Panel
+HIDDEN
+HIDDEN
+VIEWABLE
+Add / Remove Engineer Control Panel
+HIDDEN
+HIDDEN
+VIEWABLE
+4. Detailed Functional Specifications
+4.1 Tier-1 Views: Dashboard Analytics Layouts
+4.1.1 Home View (Global Dashboard Perspective)
+The standard view presents a high-level summary of all physical assets under monitoring. It contains isolated KPI summary indicator boxes layered horizontally above standard telemetry charts:
+Unauthenticated Base State Indicators: Displays total aggregated plants (starts at 2), combined installation unit metrics (starts at 20), active faulty units running counts (starts at 0), and real-time net generated generation capacity curves.
+Authenticated Structural Delta: Upon validation of an Admin or Engineer JWT context, a secondary analytical chart container ('Total System Requests Tracker') mounts onto the interface.
+4.1.2 Plant-Specific View Frames
+Clicking individual plant layout paths (e.g., Ahmedabad Power Plant) shifts the context canvas window into a localized monitoring profile. The viewport displays localized operating unit volumes, localized fault counters, and historical fuel/power outputs. Similar to the global view, authentication immediately appends an active request trend indicator card linked strictly to that plant's database id.
+4.2 Tier-2 View: AI Turbine Fault Detection Module (Engineer Exclusive)
+This workflow provides engineers with access to a diagnostic machine learning verification portal. It contains data entry forms to run operational simulations against an inspection pipeline.
+Scope Specification Inputs: A structural combo-box selector populated with currently active plant records, paired with a numeric field to isolate the physical target unit identifier.
+Operating Metrics Forms: Numeric entry inputs for operational metrics, including Turbine RPM, Steam Temperature, and Pressure thresholds.
+4.2.1 Core ML Invalidation & State Update Engine
+Clicking the 'Execute Diagnostics' control serializes the payload structure and posts it to the analytical engine. The API response contract must return two metrics: confidence_score (Float [0.00, 100.00]) and problem_class (String token, e.g., 'Normal', 'Blade Deformation').
+AUTOMATED PROPAGATION PIPELINE BLOCKCondition Ruleset:IF problem_class != 'Normal' AND confidence_score >= 90.00, the application must immediately increment the 'Faulty Units' column count by +1 globally and update the localized metrics for that specific plant across the UI.
+4.2.2 'Raise Request' Action Pipeline
+If a unit reports an operational fault, an engineer can click a high-visibility action control labeled 'Raise Request'. This opens a confirmation prompt overlay displaying a single dropdown control with three strict priorities: [Low, Medium, High]. Submitting this form creates a database record and triggers an async SMTP backend execution worker that compiles and sends all asset telemetry, plant names, unit numbers, and diagnostic values to the administrative mailbox system (dummyadmin@gmail.com).
+4.3 Tier-3 View: Centralized Raised Request Hub
+A chronological log interface that aggregates all generated requests across the enterprise.
+Sorting Control Architecture: The top-right corner of the layout workspace provides a dropdown interface to resort the card elements. Users can sort by 'Raised Request Time' (chronological / reverse) or 'Priority Level' (shifting Critical/High requests to the top of the viewport stack).
+Role Restrictions & Admin Mutation Controls: Engineers have read-only access to this interface. For Admins, two action buttons are appended to each card element:
+- 'Drop Unit': Destructive action that permanently drops the failed asset from system tracking configuration. Automatically decrements the Global Asset count by -1 and the Active Faulty count by -1.
+- 'Mark Repaired': Clears fault state tags from the target asset. Automatically decrements the Faulty Units count by -1 and returns the unit to a normal operating status across all dashboards.
+4.4 Tier-4 View: Asset & Team Management Matrix (Admin Exclusive)
+This view gives administrative personnel full command over physical structural topology boundaries and technical team deployment permissions:
+Add / Remove Plants Framework: Allows creating completely new facilities by specifying a custom plant name, nameplates, and baseline layout units. Submitting appends a routing button to the global sidebar navigation. The remove operation purges structural records from the application shell.
+Add / Remove Units Framework: Enables scaling specific assets. Admins select an active plant structure from a dropdown menu and can dynamically increment (+1) or decrement (-1) the total unit operational capacity configuration.
+Add / Remove Engineer Framework (New Navbar Control): Surfaces a management console to handle engineering personnel accounts. Provides text fields to provision new engineer credentials or delete credentials of existing engineers, updating the active user database registry instantly.
+5. Technical Architecture Hooks & Non-Functional Specifications
+5.1 Request Token Lifecycle Validation
+Header Spec: Header Spec: The routing architecture utilizes explicit token extraction paradigms to protect asset data. Every state-mutating transaction requires validation of the incoming authentication header against the server framework:
+5.2 Future GenAI Chatbot Extensibility Architecture
+Note on Future Extensibility: A conversational Large Language Model (LLM) assistant powered by the Gemini API will be added in a subsequent phase. The current UI layouts must reserve adequate spacing on the right margin of the content canvas to mount a collapsible, floating chat layout panel. Backend routers must maintain modular isolation so that adding LLM streaming orchestration engines does not impact the core dashboard performance.
