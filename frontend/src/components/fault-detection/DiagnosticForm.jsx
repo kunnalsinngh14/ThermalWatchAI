@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { Activity } from 'lucide-react';
@@ -9,16 +9,38 @@ import './FaultDetection.css';
 export const DiagnosticForm = ({ onDiagnosticSubmit }) => {
   const [loading, setLoading] = useState(false);
   const { addToast } = useToast();
+  const [plants, setPlants] = useState([]);
   const [formData, setFormData] = useState({
-    plantId: '1',
+    plantId: '',
     unitId: '1',
     rpm: '3000',
     steamTemp: '540',
     pressure: '14.5'
   });
 
+  useEffect(() => {
+    const fetchPlants = async () => {
+      try {
+        const data = await api.get('/plants');
+        setPlants(data);
+        if (data && data.length > 0) {
+          setFormData(prev => ({ ...prev, plantId: data[0].id.toString(), unitId: '1' }));
+        }
+      } catch (err) {
+        addToast(err.message || 'Failed to fetch plants', 'error');
+      }
+    };
+    fetchPlants();
+  }, []);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'plantId') {
+      // Reset unitId to 1 when changing plant
+      setFormData({ ...formData, plantId: value, unitId: '1' });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -35,6 +57,9 @@ export const DiagnosticForm = ({ onDiagnosticSubmit }) => {
     }
   };
 
+  const selectedPlant = plants.find(p => p.id.toString() === formData.plantId);
+  const totalUnits = selectedPlant ? selectedPlant.units : 0;
+
   return (
     <div className="glass-card diagnostic-form-container fade-in">
       <h3 className="form-title">Scope Specification Inputs</h3>
@@ -43,11 +68,19 @@ export const DiagnosticForm = ({ onDiagnosticSubmit }) => {
           <div className="input-wrapper">
             <label className="input-label">Target Plant</label>
             <select name="plantId" value={formData.plantId} onChange={handleChange} className="input-field select-field">
-              <option value="1">Ahmedabad Power Plant</option>
-              <option value="2">Godda Power Plant</option>
+              {plants.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
             </select>
           </div>
-          <Input label="Unit Identifier" type="number" name="unitId" value={formData.unitId} onChange={handleChange} min="1" max="20" required />
+          <div className="input-wrapper">
+            <label className="input-label">Unit Identifier</label>
+            <select name="unitId" value={formData.unitId} onChange={handleChange} className="input-field select-field">
+              {[...Array(totalUnits)].map((_, i) => (
+                <option key={i + 1} value={i + 1}>Unit {i + 1}</option>
+              ))}
+            </select>
+          </div>
         </div>
         
         <h3 className="form-title" style={{ marginTop: '24px' }}>Operating Metrics</h3>

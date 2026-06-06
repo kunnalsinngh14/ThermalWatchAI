@@ -159,7 +159,7 @@ export const PlantPage = () => {
         <KPICard title="Net Capacity" value={`${data.kpis.capacity} MW`} icon={Zap} colorClass="border-amber" />
         <KPICard title="Running Units" value={data.kpis.runningUnits} icon={PlayCircle} colorClass="border-emerald" />
         <KPICard title="Under Maintenance" value={data.kpis.maintenanceUnits} icon={Wrench} colorClass="border-amber" />
-        <KPICard title="Plant Status" value={data.kpis.faults > 0 ? 'WARNING' : 'HEALTHY'} icon={Factory} colorClass={data.kpis.faults > 0 ? "border-red" : "border-emerald"} />
+        <KPICard title="Faulty Units" value={data.kpis.faults} icon={Factory} colorClass={data.kpis.faults > 0 ? "border-red" : "border-emerald"} />
       </div>
 
       {/* Power Generation */}

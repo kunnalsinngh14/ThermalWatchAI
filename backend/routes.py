@@ -110,7 +110,7 @@ def get_requests(current_user):
     return jsonify(result)
 
 @api_bp.route('/requests', methods=['POST'])
-@roles_required('engineer')
+@roles_required('admin', 'engineer')
 def create_request(current_user):
     data = request.get_json()
     try:
@@ -317,6 +317,26 @@ def delete_engineer(current_user, id):
     db.session.commit()
     return jsonify({'message': 'Engineer access revoked'})
 
+@api_bp.route('/engineers/<int:id>', methods=['PATCH'])
+@roles_required('admin')
+def update_engineer(current_user, id):
+    user = User.query.get_or_404(id)
+    if user.role != 'engineer':
+        return jsonify({'message': 'Cannot update non-engineers'}), 400
+    
+    data = request.get_json()
+    if 'email' in data and data['email']:
+        existing = User.query.filter_by(email=data['email']).first()
+        if existing and existing.id != id:
+            return jsonify({'message': 'Email already in use'}), 400
+        user.email = data['email']
+        
+    if 'password' in data and data['password']:
+        user.password_hash = data['password']
+        
+    db.session.commit()
+    return jsonify({'message': 'Engineer updated successfully'})
+
 # --- UNITS ROUTES ---
 @api_bp.route('/plants/<int:plant_id>/units', methods=['PATCH'])
 @roles_required('admin')
@@ -389,9 +409,28 @@ def update_unit_status(current_user, id):
         elif old_status != 'faulty' and new_status == 'faulty':
             plant.faulty_units += 1
     
+    if new_status == 'under_maintenance' and old_status != 'under_maintenance':
+        from models import Request
+        new_req = Request(
+            plant_id=unit.plant_id,
+            unit_id=unit.id,
+            unit_number=unit.unit_number,
+            engineer_id=current_user.id,
+            priority='Medium',
+            fault_type='Manual Status Override',
+            confidence_score=100.0,
+            status='under_maintenance'
+        )
+        db.session.add(new_req)
+        
     if new_status == 'running':
         unit.fault_type = None
         unit.confidence_score = None
+        if old_status == 'under_maintenance':
+            from models import Request
+            active_req = Request.query.filter_by(unit_id=unit.id, status='under_maintenance').first()
+            if active_req:
+                active_req.status = 'resolved'
     
     db.session.commit()
     return jsonify({'message': f'Unit status updated to {new_status}'})
@@ -405,6 +444,21 @@ def delete_unit(current_user, id):
         plant.total_units -= 1
         if unit.status == 'faulty' and plant.faulty_units > 0:
             plant.faulty_units -= 1
+            
+    # Auto-create a dropped request so it appears in the Dropped History page
+    from models import Request
+    drop_req = Request(
+        plant_id=unit.plant_id,
+        unit_id=None,
+        unit_number=unit.unit_number,
+        engineer_id=current_user.id,
+        priority='High',
+        fault_type=unit.fault_type or 'Decommissioned by Admin',
+        confidence_score=unit.confidence_score or 100.0,
+        status='dropped'
+    )
+    db.session.add(drop_req)
+            
     db.session.delete(unit)
     db.session.commit()
     return jsonify({'message': 'Unit deleted successfully'})

@@ -170,7 +170,6 @@ export const ManageUnitsPage = () => {
                               <option value="running">Running</option>
                               <option value="faulty">Faulty</option>
                               <option value="under_maintenance">Under Maintenance</option>
-                              <option value="dropped">Dropped</option>
                             </select>
                           </td>
                         )}
@@ -181,7 +180,7 @@ export const ManageUnitsPage = () => {
                               onClick={() => handleDeleteUnit(unit.id)}
                               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                             >
-                              <Trash2 size={13} /> Remove
+                              <Trash2 size={13} /> Drop
                             </button>
                           </td>
                         )}
